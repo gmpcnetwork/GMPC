@@ -2,8 +2,10 @@
 members = [
     "binary/cli",
     "component/blockchain",
-    "component/consensus",
-    "component/blockchain"
+    "component/consensus/gbft",
+    "component/consensus/pow",
+    "component/consensus/poa",
+    "component/network"
 ]
 
 [profile.release]

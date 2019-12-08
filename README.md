@@ -2,6 +2,8 @@
 
 GMPC multi-chain structure distributed infrastructure
 
+> GMPC applies the world first complex multi-chain structure and initiates the GMPC BFT consensus mechanism. We aim at realizing the interconnections between public chains, consortium blockchains and interchains and becoming the world Top 1 flow engine within blockchain.
+
 Website: https://www.gm-pc.com
 
 ## start up
