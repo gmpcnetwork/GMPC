@@ -26,7 +26,7 @@ native_executor_instance!(
 	pub Executor,
 	gmpc_runtime::api::dispatch,
 	gmpc_runtime::native_version,
-	include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/gmpc_runtime_wasm.compact.wasm")
+	include_bytes!("../../../target/wasm32-unknown-unknown/release/gmpc_runtime_wasm.wasm")
 );
 
 #[derive(Default)]
