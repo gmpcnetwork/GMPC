@@ -5,7 +5,9 @@ members = [
     "component/consensus/gbft",
     "component/consensus/pow",
     "component/consensus/poa",
-    "component/network"
+    "component/network",
+    "component/runtime",
+    "component/wasm"
 ]
 
 [profile.release]

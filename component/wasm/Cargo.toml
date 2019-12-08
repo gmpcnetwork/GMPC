@@ -1,0 +1,19 @@
+[package]
+authors = ['GMPC authors <contact@gm-pc.com>']
+edition = '2018'
+name = 'gmpc-runtime-wasm'
+version = '1.0.0'
+
+[dependencies.gmpc-runtime]
+default-features = false
+path = '../runtime'
+
+[features]
+default = []
+std = ['gmpc-runtime/std']
+
+[lib]
+crate-type = ['cdylib']
+[profile.release]
+lto = true
+panic = 'abort'
