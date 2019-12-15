@@ -1,5 +1,5 @@
 [package]
-name = "blockchain"
+name = "primitives"
 version = "0.1.0"
 authors = ["rickeywon <rickeywon@163.com>"]
 edition = "2018"

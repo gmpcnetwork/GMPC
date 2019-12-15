@@ -1,7 +1,7 @@
 [workspace]
 members = [
     "binary/cli",
-    "component/blockchain",
+    "component/primitives",
     "component/consensus/gbft",
     "component/consensus/pow",
     "component/consensus/poa",

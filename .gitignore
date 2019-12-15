@@ -17,3 +17,4 @@ Cargo.lock
 nohup.out
 **/._*
 *.swp
+*.code-workspace
