@@ -1,34 +1,3 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
-// This file is part of Parity.
-
-// Parity is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// Parity is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with Parity.  If not, see <http://www.gnu.org/licenses/>.
-
-//! ProgPoW (Programmatic Proof-of-Work) is the Ethereum network's proposed new Application-Specific Integrated
-//! Circuit (ASIC) resistant Proof-of-Work mining algorithm.
-//!
-//! ProgPoW's aim is to reduce the efficiencies of specialized mining devices known as ASIC chips
-//! (and accelerated GPU-based setups), and to maximize the performance of General Purpose Hardware (GPUs) to enable
-//! more users to compete for new cryptocurrency awarded by the protocol.
-//!
-//! ASIC chips are those that are tailored to efficiently mining cryptocurrency based on a specific hashing algorithm.
-//!
-//! GPU mining setups are less specialised are struggle to compete for mining rewards.
-//!
-//! It would be a change from Ethereum's current PoW mining algorithm known as Ethash.
-//!
-//! ProgPoW audits have been proposed to analyse the efficiency of a ProgPoW ASICs over
-//! GPUs and analysis of the economic impact on the Ethereum protocol.
 
 use compute::{FNV_PRIME, calculate_dag_item};
 use keccak::H256;
