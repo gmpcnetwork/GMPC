@@ -1,7 +1,12 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
+mod state;
+mod config;
+
+use state::{State};
+use config::{GBFTConfig};
+
+pub struct GPBFInitlizer {
+    pub state: State,
+    pub current: u64,
+    pub config: GBFTConfig,
 }
+
