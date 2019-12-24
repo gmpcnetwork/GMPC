@@ -12,3 +12,4 @@ members = [
 
 [profile.release]
 panic = "unwind"
+keccak-hash = "0.4.0"
