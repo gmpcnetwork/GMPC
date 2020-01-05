@@ -32,6 +32,12 @@ Build all native code:
 cargo build
 ```
 
+Begin start
+
+```bash
+./scripts/start.sh
+```
+
 # Run
 
 You can start a development chain with:

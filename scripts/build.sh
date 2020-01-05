@@ -16,9 +16,6 @@ for SRC in component/wasm
 do
   echo "${bold}Building webassembly binary in $SRC...${normal}"
   cd "$PROJECT_ROOT/$SRC"
-
-  ./build.sh
-
   cd - >> /dev/null
 done
 
