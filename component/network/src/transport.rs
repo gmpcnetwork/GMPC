@@ -24,9 +24,14 @@ use libp2p::{tcp, dns, websocket, noise};
 #[cfg(not(target_os = "unknown"))]
 use libp2p::core::{either::EitherError, either::EitherOutput};
 use libp2p::core::{self, upgrade, transport::boxed::Boxed, transport::OptionalTransport, muxing::StreamMuxerBox};
-use std::{io, sync::Arc, time::Duration, usize};
+use std::{io, sync::Arc, time::Duration, usize,fmt};
+use std::error::Error as StdError;
+
+use futures::{future, Future, IntoFuture};
+use serde_json::Value as JsonValue;
 
 pub use self::bandwidth::BandwidthSinks;
+use super::error::{Error, Never};
 
 /// Builds the transport that serves as a common ground for all connections.
 ///
@@ -129,4 +134,86 @@ pub fn build_transport(
 		.boxed();
 
 	(transport, sinks)
+}
+
+
+
+pub type Result = Box<Future<Item = Option<JsonValue>, Error = Error> + Send>;
+
+pub trait Dispatch {
+	type Error: Into<Box<StdError + Send + Sync>>;
+	type Future: Future<Item = Option<JsonValue>, Error = Self::Error>;
+
+	fn call(&mut self, req: JsonValue) -> Self::Future;
+}
+
+pub struct DispatchFn<F> {
+	f: F,
+}
+
+pub fn dispatch_fn<F, D>(f: F) -> DispatchFn<F>
+	where
+		F: Fn(JsonValue) -> D,
+		D: IntoFuture, {
+	DispatchFn {
+		f,
+	}
+}
+
+impl<F, Ret> Dispatch for DispatchFn<F>
+	where
+		F: Fn(JsonValue) -> Ret,
+		Ret: IntoFuture<Item = Option<JsonValue>>,
+		Ret::Error: Into<Box<StdError + Send + Sync>>,
+{
+	type Error = Ret::Error;
+	type Future = Ret::Future;
+
+	fn call(&mut self, req: JsonValue) -> Self::Future {
+		(self.f)(req).into_future()
+	}
+}
+
+impl<F> IntoFuture for DispatchFn<F> {
+	type Future = future::FutureResult<Self::Item, Self::Error>;
+	type Item = Self;
+	type Error = Never;
+
+	fn into_future(self) -> Self::Future {
+		future::ok(self)
+	}
+}
+
+impl<F> fmt::Debug for DispatchFn<F> {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		f.debug_struct("impl Dispatch").finish()
+	}
+}
+
+/// An asynchronous constructor of `Dispatch`s.
+pub trait NewDispatch {
+	type Error: Into<Box<StdError + Send + Sync>>;
+	type Dispatch: Dispatch<Error = Self::Error>;
+	type Future: Future<Item = Self::Dispatch, Error = Self::InitError>;
+	type InitError: Into<Box<StdError + Send + Sync>>;
+
+	/// Create a new `Dispatch`.
+	fn new_dispatch(&self) -> Self::Future;
+}
+
+impl<F, R, D> NewDispatch for F
+	where
+		F: Fn() -> R,
+		R: IntoFuture<Item = D>,
+		R::Error: Into<Box<StdError + Send + Sync>>,
+		D: Dispatch,
+{
+	type Error = D::Error;
+	type Dispatch = D;
+	type Future = R::Future;
+	type InitError = R::Error;
+
+	fn new_dispatch(&self) -> Self::Future {
+		(*self)().into_future()
+	}
 }
