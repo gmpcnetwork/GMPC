@@ -79,7 +79,8 @@ path = '../../component/runtime'
 
 [[bin]]
 name = 'gmpc'
-path = 'src/main.rs' 
+path = 'src/main.rs'
+
 
 [build-dependencies]
 vergen = '3'
