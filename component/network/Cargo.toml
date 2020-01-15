@@ -16,5 +16,4 @@ erased-serde = "0.3.9"
 slog = { version = "2.5.2", features = ["nested-values"] }
 futures = "0.1.21"
 bytes = "0.4"
-serde_json = "1.0"
 tokio = "0.1"
