@@ -1,3 +1,9 @@
+[package]
+authors = ['GMPC authors <contact@gm-pc.com>']
+edition = '2018'
+name = 'gmpc'
+version = '0.1.0'
+
 [workspace]
 members = [
     "binary/cli",
