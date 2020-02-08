@@ -1,5 +1,5 @@
 [package]
-name = "gmpc"
+name = "gmpc_cli"
 version = "0.1.0"
 authors = ["rickeywon <rickeywon@163.com>"]
 edition = "2018"
@@ -74,11 +74,12 @@ package = 'substrate-transaction-pool'
 rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
 
 [dependencies.gmpc-runtime]
-path = '../../component/runtime'
+path = '../component/runtime'
 
 
 [[bin]]
-name = 'gmpc'
+
+name = 'gmpc_cli'
 path = 'src/main.rs'
 
 
