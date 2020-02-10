@@ -1,9 +1,7 @@
 #![warn(missing_docs)]
 #![warn(unused_extern_crates)]
 
-mod genesis;
-mod service;
-mod cli;
+use cli::VersionInfo;
 
 pub use substrate_cli::{VersionInfo, IntoExit, error};
 

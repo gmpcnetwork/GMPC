@@ -4,6 +4,9 @@ edition = '2018'
 name = 'gmpc'
 version = '0.1.0'
 
+[dependencies]
+cli = {path = "cli"}
+
 [workspace]
 members = [
     "cli",
