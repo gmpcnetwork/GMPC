@@ -19,5 +19,7 @@ do
   cd - >> /dev/null
 done
 
+cargo build --release
+
 # Restore initial directory.
 popd >/dev/null
