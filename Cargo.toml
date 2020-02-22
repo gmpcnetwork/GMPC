@@ -5,18 +5,18 @@ name = 'gmpc'
 version = '0.1.0'
 
 [dependencies]
-cli = {path = "cli"}
+#cli = {path = "cli"}
 
 [workspace]
 members = [
-    "cli",
-    "component/primitives",
-    "component/consensus/gbft",
-    "component/consensus/pow",
-    "component/consensus/poa",
-    "component/network",
-    "component/runtime",
-    "component/wasm"
+#    "cli",
+#    "component/primitives",
+#    "component/consensus/gbft",
+#    "component/consensus/pow",
+#    "component/consensus/poa",
+#    "component/network",
+#    "component/runtime",
+#    "component/wasm"
 ]
 
 [profile.release]
