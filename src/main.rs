@@ -1,4 +1,3 @@
-
 #![warn(missing_docs)]
 
 use std::ffi::OsString;
@@ -26,7 +25,7 @@ enum Error {
 	BinaryNotFound,
 	ExitCode(i32),
 	Restart,
-	Unknown
+	Unknown,
 }
 
 fn update_path(name: &str) -> PathBuf {
@@ -86,7 +85,7 @@ fn global_cleanup() {
 	// We need to cleanup all sockets before spawning another Parity process. This makes sure everything is cleaned up.
 	// The loop is required because of internal reference counter for winsock dll. We don't know how many crates we use do
 	// initialize it. There's at least 2 now.
-	for _ in 0.. 10 {
+	for _ in 0..10 {
 		unsafe { ::winapi::um::winsock2::WSACleanup(); }
 	}
 }
@@ -107,34 +106,6 @@ fn global_init() {
 #[cfg(not(windows))]
 fn global_cleanup() {}
 
-// Starts parity binary installed via `parity-updater` and returns the code it exits with.
-fn run_parity() -> Result<(), Error> {
-	global_init();
-
-	let prefix = vec![OsString::from("--can-restart"), OsString::from("--force-direct")];
-
-	let res: Result<(), Error> = latest_exe_path()
-		.and_then(|exe| process::Command::new(exe)
-			.args(&(env::args_os().skip(1).chain(prefix.into_iter()).collect::<Vec<_>>()))
-			.status()
-			.ok()
-			.map_or(Err(Error::Unknown), |es| {
-				match es.code() {
-					// Process success
-					Some(0) => Ok(()),
-					// Please restart
-					Some(PLEASE_RESTART_EXIT_CODE) => Err(Error::Restart),
-					// Process error code `c`
-					Some(c) => Err(Error::ExitCode(c)),
-					// Unknown error, couldn't determine error code
-					_ => Err(Error::Unknown),
-				}
-			})
-		);
-
-	global_cleanup();
-	res
-}
 
 #[derive(Debug)]
 /// Status used to exit or restart the program.
@@ -198,7 +169,7 @@ fn main_direct(force_can_restart: bool) -> i32 {
 		panicking: false,
 		should_exit: false,
 		should_restart: false,
-		spec_name_override: None
+		spec_name_override: None,
 	}), Condvar::new()));
 
 	// Double panic can happen. So when we lock `ExitStatus` after the main thread is notified, it cannot be locked
@@ -238,7 +209,7 @@ fn main_direct(force_can_restart: bool) -> i32 {
 						e.1.notify_all();
 					}
 				}
-			}
+			},
 		)
 	} else {
 		trace!(target: "mode", "Not hypervised: not setting exit handlers.");
@@ -247,7 +218,10 @@ fn main_direct(force_can_restart: bool) -> i32 {
 
 	let res = match exec {
 		Ok(result) => match result {
-			ExecutionAction::Instant(Some(s)) => { println!("{}", s); 0 },
+			ExecutionAction::Instant(Some(s)) => {
+				println!("{}", s);
+				0
+			}
 			ExecutionAction::Instant(None) => 0,
 			ExecutionAction::Running(client) => {
 				panic_hook::set_with({
@@ -310,7 +284,7 @@ fn main_direct(force_can_restart: bool) -> i32 {
 						0
 					}
 				}
-			},
+			}
 		},
 		Err(err) => {
 			// error occured during start up
@@ -320,7 +294,7 @@ fn main_direct(force_can_restart: bool) -> i32 {
 			}
 			eprintln!("{}", err);
 			1
-		},
+		}
 	};
 
 	global_cleanup();
@@ -339,86 +313,7 @@ macro_rules! trace_main {
 }
 
 fn main() {
-	panic_hook::set_abort();
-
-	// the user has specified to run its originally installed binary (not via `parity-updater`)
-	let force_direct = std::env::args().any(|arg| arg == "--force-direct");
-
-	// absolute path to the current `binary`
-	let exe_path = std::env::current_exe().ok();
-
-	// the binary is named `target/xx/yy`
-	let development = exe_path
-		.as_ref()
-		.and_then(|p| {
-			p.parent()
-				.and_then(|p| p.parent())
-				.and_then(|p| p.file_name())
-				.map(|n| n == "target")
-		})
-		.unwrap_or(false);
-
-	// the binary is named `parity`
-	let same_name = exe_path
-		.as_ref()
-		.map_or(false, |p| {
-			p.file_stem().map_or(false, |n| n == PARITY_EXECUTABLE_NAME)
-		});
-
-	trace_main!("Starting up {} (force-direct: {}, development: {}, same-name: {})",
-				std::env::current_exe().ok().map_or_else(|| "<unknown>".into(), |x| format!("{}", x.display())),
-				force_direct,
-				development,
-				same_name);
-
-	if !force_direct && !development && same_name {
-		// Try to run the latest installed version of `parity`,
-		// Upon failure it falls back to the locally installed version of `parity`
-		// Everything run inside a loop, so we'll be able to restart from the child into a new version seamlessly.
-		loop {
-			// `Path` to the latest downloaded binary
-			let latest_exe = latest_exe_path().ok();
-
-			// `Latest´ binary exist
-			let have_update = latest_exe.as_ref().map_or(false, |p| p.exists());
-
-			// Canonicalized path to the current binary is not the same as to latest binary
-			let canonicalized_path_not_same = exe_path
-				.as_ref()
-				.map_or(false, |exe| latest_exe.as_ref()
-					.map_or(false, |lexe| exe.canonicalize().ok() != lexe.canonicalize().ok()));
-
-			// Downloaded `binary` is newer
-			let update_is_newer = latest_binary_is_newer(&latest_exe, &exe_path);
-			trace_main!("Starting... (have-update: {}, non-updated-current: {}, update-is-newer: {})", have_update, canonicalized_path_not_same, update_is_newer);
-
-			let exit_code = if have_update && canonicalized_path_not_same && update_is_newer {
-				trace_main!("Attempting to run latest update ({})...",
-							latest_exe.as_ref().expect("guarded by have_update; latest_exe must exist for have_update; qed").display());
-				match run_parity() {
-					Ok(_) => 0,
-					// Restart parity
-					Err(Error::Restart) => PLEASE_RESTART_EXIT_CODE,
-					// Fall back to local version
-					Err(e) => {
-						error!(target: "updater", "Updated binary could not be executed error: {:?}. Falling back to local version", e);
-						main_direct(true)
-					}
-				}
-			} else {
-				trace_main!("No latest update. Attempting to direct...");
-				main_direct(true)
-			};
-			trace_main!("Latest binary exited with exit code: {}", exit_code);
-			if exit_code != PLEASE_RESTART_EXIT_CODE {
-				trace_main!("Quitting...");
-				process::exit(exit_code);
-			}
-			trace!(target: "updater", "Re-running updater loop");
-		}
-	} else {
-		trace_main!("Running direct");
-		// Otherwise, we're presumably running the version we want. Just run and fall-through.
-		process::exit(main_direct(false));
-	}
+	trace_main!("Running direct");
+	// Otherwise, we're presumably running the version we want. Just run and fall-through.
+	process::exit(main_direct(false));
 }
