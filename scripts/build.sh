@@ -14,10 +14,12 @@ pushd . >/dev/null
 
 for SRC in component/wasm
 do
-  echo "${bold}Building webassembly binary in $SRC...${normal}"
+  echo "${bold}Building webassembly src in $SRC...${normal}"
   cd "$PROJECT_ROOT/$SRC"
   cd - >> /dev/null
 done
+
+cargo build --release
 
 # Restore initial directory.
 popd >/dev/null

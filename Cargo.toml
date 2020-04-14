@@ -4,9 +4,12 @@ edition = '2018'
 name = 'gmpc'
 version = '0.1.0'
 
+[dependencies]
+cli = {path = "cli"}
+
 [workspace]
 members = [
-    "binary/cli",
+    "cli",
     "component/primitives",
     "component/consensus/gbft",
     "component/consensus/pow",
@@ -19,3 +22,7 @@ members = [
 [profile.release]
 panic = "unwind"
 keccak-hash = "0.4.0"
+
+[[bin]]
+name = 'gmpc'
+path = 'src/main.rs'
