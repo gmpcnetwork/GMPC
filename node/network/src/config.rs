@@ -22,7 +22,7 @@ use libp2p::wasm_ext;
 use libp2p::{multiaddr, Multiaddr, PeerId};
 use prometheus_endpoint::Registry;
 use sp_consensus::{block_validation::BlockAnnounceValidator, import_queue::ImportQueue};
-use sp_runtime::{traits::Block as BlockT, ConsensusEngineId};
+//use sp_runtime::{traits::Block as BlockT, ConsensusEngineId};
 use std::{borrow::Cow, convert::TryFrom, future::Future, pin::Pin, str::FromStr};
 use std::{
 	error::Error,
@@ -33,6 +33,9 @@ use std::{
 	sync::Arc,
 };
 use zeroize::Zeroize;
+
+/// Consensus engine unique ID.
+pub type ConsensusEngineId = [u8; 4];
 
 /// Network initialization parameters.
 pub struct Params<B: BlockT, H: ExHashT> {
@@ -47,7 +50,7 @@ pub struct Params<B: BlockT, H: ExHashT> {
 	pub network_config: NetworkConfiguration,
 
 	/// Client that contains the blockchain.
-	pub chain: Arc<dyn Client<B>>,
+//	pub chain: Arc<dyn Client<B>>,
 
 	/// Finality proof provider.
 	///

@@ -1,4 +1,3 @@
-//! Ethcore client application.
 #![warn(missing_docs)]
 
 use std::fs::File;
