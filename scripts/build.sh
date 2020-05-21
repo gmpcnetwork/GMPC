@@ -2,6 +2,8 @@
 
 set -e
 
+./init.sh
+
 PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null && pwd )"
 
 export CARGO_INCREMENTAL=0
